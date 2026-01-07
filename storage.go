@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 type Client struct {
@@ -12,7 +12,7 @@ type Client struct {
 }
 
 func NewClient(filepath string) (*Client, error) {
-	db, err := sql.Open("sqlite3", filepath)
+	db, err := sql.Open("sqlite", filepath)
 	if err != nil {
 		return nil, err
 	}

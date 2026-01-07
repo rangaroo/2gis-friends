@@ -21,6 +21,8 @@ type appConfig struct {
 }
 
 func main() {
+	fmt.Println("Starting 2GIS Friend Tracker...")
+
 	godotenv.Load(".env")
 
 	// Load config
