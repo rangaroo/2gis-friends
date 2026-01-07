@@ -1,21 +1,31 @@
 package main
 
 import (
-	"os"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
-	"github.com/joho/godotenv"
 	"github.com/gorilla/websocket"
+	"github.com/joho/godotenv"
 )
 
 // UserCache is a simple memory store to map IDs to Names
 var userCache = make(map[string]string)
 
+type appConfig struct {
+	accessToken string
+	appVersion  string
+	userAgent   string
+	siteDomain  string
+}
+
 func main() {
+	fmt.Println("Starting 2GIS Friend Tracker...")
+
 	godotenv.Load(".env")
 
+	// Load config
 	accessToken := os.Getenv("ACCESS_TOKEN") //TODO: Figure out how to generate these tokens
 	if accessToken == "" {
 		log.Fatal("ACCESS_TOKEN must be set")
@@ -36,17 +46,38 @@ func main() {
 		log.Fatal("SITE_DOMAIN must be set")
 	}
 
+	pathToDB := os.Getenv("DB_PATH")
+	if pathToDB == "" {
+		log.Fatal("DB_PATH must be set")
+	}
+
+	cfg := appConfig{
+		accessToken: accessToken,
+		appVersion:  appVersion,
+		userAgent:   userAgent,
+		siteDomain:  siteDomain,
+	}
+
+	// Initialize database connection
+	db, err := NewClient(pathToDB)
+	if err != nil {
+		log.Fatal("Failed to init database:", err)
+	}
+	defer db.Close()
+
+	fmt.Println("Database connected successfully")
+
 	url := fmt.Sprintf(
 		"wss://zond.api.2gis.ru/api/1.1/user/ws?appVersion=%s&channels=markers,sharing,routes&token=%s",
-		appVersion,
-		accessToken,
+		cfg.appVersion,
+		cfg.accessToken,
 	)
 
 	headers := http.Header{}
-	headers.Add("Origin", siteDomain)
-	headers.Add("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0")
+	headers.Add("Origin", cfg.siteDomain)
+	headers.Add("User-Agent", cfg.userAgent)
 
-	// 2. Connect
+	// Connect to websocket
 	log.Printf("Connecting to 2GIS...")
 	c, _, err := websocket.DefaultDialer.Dial(url, headers)
 	if err != nil {
@@ -55,7 +86,7 @@ func main() {
 	defer c.Close()
 	log.Println("Connected. Waiting for friends...")
 
-	// 3. Listen Loop
+	// Listen Loop
 	for {
 		_, message, err := c.ReadMessage()
 		if err != nil {
@@ -63,7 +94,6 @@ func main() {
 			return
 		}
 
-		handleMessage(message)
+		handleMessage(message, db)
 	}
 }
-

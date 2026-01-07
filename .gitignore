@@ -1,1 +1,4 @@
 .env
+*.db
+.idea/
+2gis-friends
