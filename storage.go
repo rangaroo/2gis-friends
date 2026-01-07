@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"log"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -12,23 +11,22 @@ type Client struct {
 	db *sql.DB
 }
 
-func InitClient(filepath string) (*Client, error) {
+func NewClient(filepath string) (*Client, error) {
 	db, err := sql.Open("sqlite3", filepath)
 	if err != nil {
 		return nil, err
 	}
 
 	c := &Client{db: db}
-	if err := s.createTables(); err != nil {
+	if err := c.createTables(); err != nil {
 		return nil, err
 	}
 
-	return s, nil
+	return c, nil
 }
 
 func (c *Client) createTables() error {
 	// 1. Table for static info (Name, Avatar)
-	// We use INSERT OR REPLACE so if they change their avatar, we update it.
 	queryProfiles := `
 	CREATE TABLE IF NOT EXISTS profiles (
 		user_id TEXT PRIMARY KEY,
@@ -65,7 +63,7 @@ func (c *Client) SaveProfile(id, name, avatar string) error {
 	query := `
 	INSERT OR REPLACE INTO profiles (user_id, name, avatar_url, last_updated) 
 	VALUES (?, ?, ?, CURRENT_TIMESTAMP)`
-	
+
 	_, err := c.db.Exec(query, id, name, avatar)
 	return err
 }
@@ -81,15 +79,15 @@ func (c *Client) SaveState(state State) error {
 	batteryPct := int(state.Battery.Level * 100)
 
 	// NOTE: Leave it empty for now
-	status := "unknown" 
+	status := "unknown"
 
-	_, err := c.db.Exec(query, 
-		state.ID, 
-		state.Location.Lat, 
-		state.Location.Lon, 
-		batteryPct, 
-		state.Battery.IsCharging, 
-		status, 
+	_, err := c.db.Exec(query,
+		state.ID,
+		state.Location.Lat,
+		state.Location.Lon,
+		batteryPct,
+		state.Battery.IsCharging,
+		status,
 		t,
 	)
 	return err

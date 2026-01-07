@@ -1,13 +1,13 @@
 package main
 
 import (
-	"os"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
-	"github.com/joho/godotenv"
 	"github.com/gorilla/websocket"
+	"github.com/joho/godotenv"
 )
 
 // UserCache is a simple memory store to map IDs to Names
@@ -23,6 +23,7 @@ type appConfig struct {
 func main() {
 	godotenv.Load(".env")
 
+	// Load config
 	accessToken := os.Getenv("ACCESS_TOKEN") //TODO: Figure out how to generate these tokens
 	if accessToken == "" {
 		log.Fatal("ACCESS_TOKEN must be set")
@@ -43,12 +44,26 @@ func main() {
 		log.Fatal("SITE_DOMAIN must be set")
 	}
 
+	pathToDB := os.Getenv("DB_PATH")
+	if pathToDB == "" {
+		log.Fatal("DB_PATH must be set")
+	}
+
 	cfg := appConfig{
 		accessToken: accessToken,
 		appVersion:  appVersion,
 		userAgent:   userAgent,
 		siteDomain:  siteDomain,
 	}
+
+	// Initialize database connection
+	db, err := NewClient(pathToDB)
+	if err != nil {
+		log.Fatal("Failed to init database:", err)
+	}
+	defer db.Close()
+
+	fmt.Println("Database connected successfully")
 
 	url := fmt.Sprintf(
 		"wss://zond.api.2gis.ru/api/1.1/user/ws?appVersion=%s&channels=markers,sharing,routes&token=%s",
@@ -77,7 +92,6 @@ func main() {
 			return
 		}
 
-		handleMessage(message)
+		handleMessage(message, db)
 	}
 }
-
