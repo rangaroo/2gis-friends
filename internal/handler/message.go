@@ -8,6 +8,7 @@ import (
 
 	"github.com/rangaroo/2gis-friends/internal/models"
 	"github.com/rangaroo/2gis-friends/internal/database"
+	"github.com/rangaroo/2gis-friends/internal/config"
 )
 
 type BaseMessage struct {
@@ -16,12 +17,14 @@ type BaseMessage struct {
 }
 
 type Handler {
-	db database.Client
+	db        *database.Client
+	userCache *config.UserCache
 }
 
 func New(db *database.Client) {
 	return &Handler{
-		db: db,
+		db:        db,
+		userCache: userCache,
 	}
 }
 
@@ -34,9 +37,9 @@ func (h *Handler) HandleMessage(data []byte) {
 
 	switch base.Type {
 	case "initialState":
-
+		h.handleInitialState(base.Payload)
 	case "friendState":
-
+		h.handleFriendState(base.Payload)
 	default:
 		// Ignore heartbeats or other messages
 	}
@@ -51,7 +54,7 @@ func (h *Handler) handleInitialState(payload json.RawMessage) {
 
 	fmt.Println("--- Loading Friends List ---")
 	for _, p := range data.Profiles {
-		userCache[p.ID] = p.Name
+		h.userCache.Set(p.ID, p.Name)
 		fmt.Printf("Found friend: %s (%s)\n", p.Name, p.ID)
 	}
 
@@ -71,7 +74,7 @@ func (h *Handler) handleFriendState(payload json.RawMessage) {
 }
 
 func (h *Handler) logState(s models.State) {
-	name, exists := userCache[s.ID]
+	name, exists := h.userCache.Get(p.ID, p.Name)
 	if !exists {
 		name = "Unknown User"
 	}

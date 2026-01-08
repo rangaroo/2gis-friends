@@ -11,9 +11,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// UserCache is a simple memory store to map IDs to Names
-var userCache = make(map[string]string)
-
 func main() {
 	fmt.Println("Starting 2GIS Friend Tracker...")
 
