@@ -1,10 +1,11 @@
-package main
+package database
 
 import (
 	"database/sql"
 	"time"
 
 	_ "modernc.org/sqlite"
+	"github.com/rangaroo/2gis-friends/internal/models"
 )
 
 type Client struct {
@@ -68,7 +69,7 @@ func (c *Client) SaveProfile(id, name, avatar string) error {
 	return err
 }
 
-func (c *Client) SaveState(state State) error {
+func (c *Client) SaveState(state models.State) error {
 	query := `
 	INSERT INTO locations (user_id, lat, lon, battery_level, is_charging, status, recorded_at) 
 	VALUES (?, ?, ?, ?, ?, ?, ?)`
