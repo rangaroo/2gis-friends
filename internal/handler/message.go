@@ -16,7 +16,7 @@ type BaseMessage struct {
 	Payload json.RawMessage `json:"payload"`
 }
 
-type Handler {
+type Handler struct {
 	db        *database.Client
 	userCache *config.UserCache
 }

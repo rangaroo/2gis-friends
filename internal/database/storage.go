@@ -26,72 +26,46 @@ func NewClient(filepath string) (*Client, error) {
 	return c, nil
 }
 
-func (c *Client) createTables() error {
-	// 1. Table for static info (Name, Avatar)
-	queryProfiles := `
-	CREATE TABLE IF NOT EXISTS profiles (
-		user_id TEXT PRIMARY KEY,
-		name TEXT,
-		avatar_url TEXT,
-		last_updated DATETIME DEFAULT CURRENT_TIMESTAMP
-	);`
-
-	// 2. Table for the history log
-	queryHistory := `
+func (db *Client) initSchema() error {
+	schema := `
 	CREATE TABLE IF NOT EXISTS locations (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		user_id TEXT,
-		lat REAL,
-		lon REAL,
-		battery_level INTEGER,
+		user_id TEXT NOT NULL,
+		lat REAL NOT NULL,
+		lon REAL NOT NULL,
+		accuracy REAL,
+		speed REAL,
+		battery_level REAL,
 		is_charging BOOLEAN,
-		status TEXT,
-		recorded_at DATETIME,
-		FOREIGN KEY(user_id) REFERENCES profiles(user_id)
-	);`
-
-	if _, err := c.db.Exec(queryProfiles); err != nil {
-		return err
-	}
-	if _, err := c.db.Exec(queryHistory); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (c *Client) SaveProfile(id, name, avatar string) error {
-	query := `
-	INSERT OR REPLACE INTO profiles (user_id, name, avatar_url, last_updated) 
-	VALUES (?, ?, ?, CURRENT_TIMESTAMP)`
-
-	_, err := c.db.Exec(query, id, name, avatar)
+		timestamp INTEGER NOT NULL
+	);
+	CREATE INDEX IF NOT EXISTS idx_user_timestamp ON locations(user_id, timestamp DESC);
+	`
+	_, err := db.conn.Exec(schema)
 	return err
 }
 
-func (c *Client) SaveState(state models.State) error {
-	query := `
-	INSERT INTO locations (user_id, lat, lon, battery_level, is_charging, status, recorded_at) 
-	VALUES (?, ?, ?, ?, ?, ?, ?)`
+func (db *Client) SaveState(state models.State) error {
+	query := `INSERT INTO locations (user_id, lat, lon, accuracy, speed, battery_level, is_charging, timestamp)
+	          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 
-	// Convert 2GIS timestamp (milliseconds) to Go Time
-	t := time.Unix(state.LastSeen/1000, 0)
-
-	batteryPct := int(state.Battery.Level * 100)
-
-	// NOTE: Leave it empty for now
-	status := "unknown"
-
-	_, err := c.db.Exec(query,
+	_, err := db.conn.Exec(query,
 		state.ID,
 		state.Location.Lat,
 		state.Location.Lon,
-		batteryPct,
+		state.Location.Accuracy,
+		state.Location.Speed,
+		state.Battery.Level,
 		state.Battery.IsCharging,
-		status,
-		t,
+		state.LastSeen,
 	)
 	return err
+}
+
+func (c *Client) Reset() error {
+	if _, err := c.db.Exec("DELETE FROM locations"); err != nil {
+		return fmt.Errorf("failed to reset table locations: %w", err)
+	}
 }
 
 func (c *Client) Close() {
