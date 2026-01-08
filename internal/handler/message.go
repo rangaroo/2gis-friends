@@ -6,9 +6,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/rangaroo/2gis-friends/internal/models"
-	"github.com/rangaroo/2gis-friends/internal/database"
 	"github.com/rangaroo/2gis-friends/internal/config"
+	"github.com/rangaroo/2gis-friends/internal/database"
+	"github.com/rangaroo/2gis-friends/internal/models"
 )
 
 type BaseMessage struct {
@@ -21,7 +21,7 @@ type Handler struct {
 	userCache *config.UserCache
 }
 
-func New(db *database.Client) {
+func New(db *database.Client, userCache *config.UserCache) *Handler {
 	return &Handler{
 		db:        db,
 		userCache: userCache,
@@ -74,17 +74,16 @@ func (h *Handler) handleFriendState(payload json.RawMessage) {
 }
 
 func (h *Handler) logState(s models.State) {
-	name, exists := h.userCache.Get(p.ID, p.Name)
+	name, exists := h.userCache.Get(s.ID)
 	if !exists {
 		name = "Unknown User"
 	}
 
 	t := time.Unix(s.LastSeen/1000, 0)
-
 	fmt.Printf("[UPDATE] %s is at [%f, %f] (Battery: %.0f%%) - Time: %s\n",
 		name, s.Location.Lat, s.Location.Lon, s.Battery.Level*100, t.Format("15:04:05"))
 
-	if err != h.db.SaveState(s); err != nil {
+	if err := h.db.SaveState(s); err != nil {
 		log.Printf("Failed to save state to db: %v\n", err)
 	}
 }

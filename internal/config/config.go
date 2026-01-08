@@ -16,7 +16,7 @@ type Config struct {
 }
 
 func Load() (*Config, error) {
-	godotenv.Load(".env")
+	godotenv.Load("../../.env")
 
 	cfg := &Config{
 		AccessToken: os.Getenv("ACCESS_TOKEN"),

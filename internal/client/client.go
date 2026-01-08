@@ -1,5 +1,12 @@
 package client
 
+import (
+	"log"
+	"net/http"
+
+	"github.com/gorilla/websocket"
+	"github.com/rangaroo/2gis-friends/internal/config"
+)
 
 type Client struct {
 	conn *websocket.Conn
@@ -27,7 +34,7 @@ func (c *Client) ReadMessages(handler func([]byte)) error {
 		if err != nil {
 			return err
 		}
-		handler.HandleMessage(message)
+		handler(message)
 	}
 }
 
