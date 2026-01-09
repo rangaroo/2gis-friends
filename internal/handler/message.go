@@ -55,10 +55,16 @@ func (h *Handler) handleInitialState(payload json.RawMessage) {
 	fmt.Println("--- Loading Friends List ---")
 	for _, p := range data.Profiles {
 		h.userCache.Set(p.ID, p.Name)
-		fmt.Printf("Found friend: %s (%s)\n", p.Name, p.ID)
+		fmt.Printf("* %s (%s)\n", p.Name, p.ID)
 	}
 
+	fmt.Println()
+
 	for _, s := range data.States {
+		if err := h.db.SaveState(s); err != nil {
+			log.Printf("Failed to save state to db: %v\n", err)
+		}
+
 		h.logState(s)
 	}
 }
@@ -68,6 +74,10 @@ func (h *Handler) handleFriendState(payload json.RawMessage) {
 	if err := json.Unmarshal(payload, &state); err != nil {
 		log.Println("Error parsing friendState:", err)
 		return
+	}
+
+	if err := h.db.SaveState(state); err != nil {
+		log.Printf("Failed to save state to db: %v\n", err)
 	}
 
 	h.logState(state)
@@ -83,7 +93,4 @@ func (h *Handler) logState(s models.State) {
 	fmt.Printf("[UPDATE] %s is at [%f, %f] (Battery: %.0f%%) - Time: %s\n",
 		name, s.Location.Lat, s.Location.Lon, s.Battery.Level*100, t.Format("15:04:05"))
 
-	if err := h.db.SaveState(s); err != nil {
-		log.Printf("Failed to save state to db: %v\n", err)
-	}
 }

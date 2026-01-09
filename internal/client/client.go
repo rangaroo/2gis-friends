@@ -19,13 +19,14 @@ func Connect(cfg *config.Config) (*Client, error) {
 	headers.Add("User-Agent", cfg.UserAgent)
 
 	// Connect to websocket
-	log.Printf("Connecting to 2GIS...")
+	log.Println("Connecting to 2GIS...")
 	conn, _, err := websocket.DefaultDialer.Dial(cfg.WebSocketURL(), headers)
 	if err != nil {
 		return nil, fmt.Errorf("connection failed: %w", err)
 	}
 
-	log.Println("Connected to 2GIS")
+	log.Println("Connected to 2GIS\n")
+
 	return &Client{conn: conn}, nil
 }
 

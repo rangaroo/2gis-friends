@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"context"
 	"os"
@@ -16,7 +15,7 @@ import (
 )
 
 func main() {
-	fmt.Println("Starting 2GIS Friend Tracker...")
+	log.Println("Starting 2GIS Friend Tracker...")
 
 	// load config
 	cfg, err := config.Load()
@@ -33,7 +32,7 @@ func main() {
 		log.Println("Closing database...")
 		db.Close()
 	}()
-	fmt.Println("Database connected successfully")
+	log.Println("Database connected successfully")
 
 	// create user cache to store 2GIS friend's profiles
 	userCache := config.NewUserCache()
