@@ -3,6 +3,7 @@ package client
 import (
 	"log"
 	"net/http"
+	"fmt"
 
 	"github.com/gorilla/websocket"
 	"github.com/rangaroo/2gis-friends/internal/config"
@@ -21,10 +22,10 @@ func Connect(cfg *config.Config) (*Client, error) {
 	log.Printf("Connecting to 2GIS...")
 	conn, _, err := websocket.DefaultDialer.Dial(cfg.WebSocketURL(), headers)
 	if err != nil {
-		log.Fatal("Connection failed:", err)
+		return nil, fmt.Errorf("connection failed: %w", err)
 	}
 
-	log.Println("Connected. Waiting for friends...")
+	log.Println("Connected to 2GIS")
 	return &Client{conn: conn}, nil
 }
 
@@ -39,5 +40,10 @@ func (c *Client) ReadMessages(handler func([]byte)) error {
 }
 
 func (c *Client) Close() error {
+	if c.conn == nil {
+        return nil
+    }
+
+	c.conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 	return c.conn.Close()
 }
