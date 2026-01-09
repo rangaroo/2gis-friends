@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"log"
 	"context"
-	"signal"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/rangaroo/2gis-friends/internal/client"
 	"github.com/rangaroo/2gis-friends/internal/config"
@@ -29,7 +32,7 @@ func main() {
 	defer func() {
 		log.Println("Closing database...")
 		db.Close()
-	}
+	}()
 	fmt.Println("Database connected successfully")
 
 	// create user cache to store 2GIS friend's profiles
@@ -42,19 +45,13 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
-	// connect to client
-	ws, err := client.Connect(cfg)
-	if err != nil {
-		log.Fatal("WebSocket connection failed:", err)
-	}
-	defer ws.Close()
+	// start supervisor loop that cancels on Ctrl+C and reconnects to websocket if connection is lost
+	supervisorLoop(ctx, cfg, db, handler)
 
-	if err := ws.ReadMessages(handler.HandleMessage); err != nil {
-		log.Println("WebSocket error:", err)
-	}
+	log.Println("Exiting...")
 }
 
-func supervisorLoop(ctx context.Context, cfg *config.Config, db *database.Client) {
+func supervisorLoop(ctx context.Context, cfg *config.Config, db *database.Client, handler *handler.Handler) {
 	timeout := 1 * time.Second
 
 	for {
@@ -63,7 +60,7 @@ func supervisorLoop(ctx context.Context, cfg *config.Config, db *database.Client
 			return
 		}
 
-		err != runTracker(ctx, cfg, db)
+		err := runTracker(ctx, cfg, db, handler.HandleMessage)
 
 		if ctx.Err() != nil {
 			return
@@ -83,7 +80,7 @@ func supervisorLoop(ctx context.Context, cfg *config.Config, db *database.Client
 	}
 }
 
-func runTracker(ctx context.Context, cfg *config.Config, db *database.Client) error {
+func runTracker(ctx context.Context, cfg *config.Config, db *database.Client, handleMessage func([]byte)) error {
 	// connect to client
 	ws, err := client.Connect(cfg)
 	if err != nil {
@@ -94,9 +91,9 @@ func runTracker(ctx context.Context, cfg *config.Config, db *database.Client) er
 	done := make(chan error, 1)
 
 	go func() {
-		err := ws.ReadMessages(handler.HandleMessage)
+		err := ws.ReadMessages(handleMessage)
 		done <- err
-	}
+	}()
 
 	select {
 	case <-ctx.Done():
