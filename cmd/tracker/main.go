@@ -1,8 +1,8 @@
 package main
 
 import (
-	"log"
 	"context"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -38,19 +38,19 @@ func main() {
 	userCache := config.NewUserCache()
 
 	// initialize handler
-	handler := handler.New(db, userCache)
+	h := handler.New(db, userCache)
 
 	// create context that cancels when Ctrl+C is pressed
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
 	// start supervisor loop that cancels on Ctrl+C and reconnects to websocket if connection is lost
-	supervisorLoop(ctx, cfg, db, handler)
+	supervisorLoop(ctx, cfg, db, h)
 
 	log.Println("Exiting...")
 }
 
-func supervisorLoop(ctx context.Context, cfg *config.Config, db *database.Client, handler *handler.Handler) {
+func supervisorLoop(ctx context.Context, cfg *config.Config, db *database.Client, h *handler.Handler) {
 	timeout := 1 * time.Second
 
 	for {
@@ -59,7 +59,7 @@ func supervisorLoop(ctx context.Context, cfg *config.Config, db *database.Client
 			return
 		}
 
-		err := runTracker(ctx, cfg, db, handler.HandleMessage)
+		err := runTracker(ctx, cfg, db, h.HandleMessage)
 
 		if ctx.Err() != nil {
 			return
@@ -72,7 +72,7 @@ func supervisorLoop(ctx context.Context, cfg *config.Config, db *database.Client
 			return
 		case <-time.After(timeout):
 			timeout *= 2
-			if timeout > 10 * time.Second {
+			if timeout > 10*time.Second {
 				timeout = 10 * time.Second
 			}
 		}

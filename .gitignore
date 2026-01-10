@@ -1,4 +1,5 @@
 .env
 *.db
 .idea/
+tracker
 2gis-friends
