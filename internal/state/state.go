@@ -10,15 +10,15 @@ import (
 
 type GlobalStore struct {
 	mu          sync.RWMutex
-	Profiles    map[string].models.Profile
-	States      map[string].models.State
+	Profiles    map[string]models.Profile
+	States      map[string]models.State
 	IsConnected bool
 }
 
 func NewStore() *GlobalStore {
 	return &GlobalStore{
-		Profiles: make(map[string].models.Profile),
-		States:   make(map[string].models.State),
+		Profiles: make(map[string]models.Profile),
+		States:   make(map[string]models.State),
 	}
 }
 
@@ -50,15 +50,15 @@ type ViewItem struct {
 	LastSeen   time.Time
 }
 
-func (s *GlobalStore) GetViewData() []ViewData {
+func (s *GlobalStore) GetViewData() []ViewItem {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	var data []ViewData
+	var data []ViewItem
 
 	for id, state := range s.States {
 		name := "Unknown " + id
-		if p, ok := s.Profiles[id]; ok {
+		if _, ok := s.Profiles[id]; ok {
 			name = s.Profiles[id].Name
 		}
 

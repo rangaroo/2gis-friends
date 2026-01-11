@@ -12,7 +12,7 @@ type Model struct {
 	store *state.GlobalStore
 }
 
-func NewModel(store *store.GlobalStore) Model {
+func NewModel(store *state.GlobalStore) Model {
 	return Model{store: store}
 }
 
@@ -39,17 +39,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) View() string {
 	s := "\n  📡 2GIS FRIEND TRACKER\n"
 	s += "  ──────────────────────\n\n"
-
-	// connection status
-	m.store.mu.RLock()
-	connected := m.store.IsConnected
-	m.store.mu.RUnlock()
-
-	if connected {
-		s += "  STATUS: [ 🟢 ONLINE ]\n\n"
-	} else {
-		s += "  STATUS: [ 🔴 RECONNECTING... ]\n\n"
-	}
 
 	// friends list
 	friends := m.store.GetViewData()

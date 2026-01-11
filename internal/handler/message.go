@@ -9,6 +9,7 @@ import (
 	"github.com/rangaroo/2gis-friends/internal/config"
 	"github.com/rangaroo/2gis-friends/internal/database"
 	"github.com/rangaroo/2gis-friends/internal/models"
+	"github.com/rangaroo/2gis-friends/internal/state"
 )
 
 type BaseMessage struct {
@@ -19,12 +20,14 @@ type BaseMessage struct {
 type Handler struct {
 	db        *database.Client
 	userCache *config.UserCache
+	store     *state.GlobalStore
 }
 
-func New(db *database.Client, userCache *config.UserCache) *Handler {
+func New(db *database.Client, userCache *config.UserCache, store *state.GlobalStore) *Handler {
 	return &Handler{
 		db:        db,
 		userCache: userCache,
+		store:     store,
 	}
 }
 
@@ -52,10 +55,13 @@ func (h *Handler) handleInitialState(payload json.RawMessage) {
 		return
 	}
 
-	fmt.Println("--- Loading Friends List ---")
+	// update profile data of global state
+	h.store.UpdateFromPayload(data)
+
+	//fmt.Println("--- Loading Friends List ---")
 	for _, p := range data.Profiles {
 		h.userCache.Set(p.ID, p.Name)
-		fmt.Printf("* %s (%s)\n", p.Name, p.ID)
+		//fmt.Printf("* %s (%s)\n", p.Name, p.ID)
 	}
 
 	fmt.Println()
@@ -65,7 +71,7 @@ func (h *Handler) handleInitialState(payload json.RawMessage) {
 			log.Printf("Failed to save state to db: %v\n", err)
 		}
 
-		h.logState(s)
+		//h.logState(s)
 	}
 }
 
@@ -80,7 +86,7 @@ func (h *Handler) handleFriendState(payload json.RawMessage) {
 		log.Printf("Failed to save state to db: %v\n", err)
 	}
 
-	h.logState(state)
+	//h.logState(state)
 }
 
 func (h *Handler) logState(s models.State) {
