@@ -12,7 +12,6 @@ This application connects to the 2GIS WebSocket API to track your friends' locat
 - **Friend Profile Management**: Caches friend profiles for quick lookups
 - **Location History**: Stores all location updates in a SQLite database
 
-
 ## Prerequisites
 
 - Go 1.25.4 or higher
@@ -81,17 +80,12 @@ To run this tracker, you need your personal 2GIS access token. This token allows
 
 > **TODO**: Document the process for generating 2GIS access tokens
 
-Currently, you need to obtain an access token from the 2GIS API.
-1. Authenticating with your 2GIS account
-2. Extracting the access token from the authenticated session
-
 ## Usage
 
-Run the tracker from the `cmd/tracker` directory:
+Run the tracker from the root directory:
 
 ```bash
-cd cmd/tracker
-go run .
+go run ./cmd/tracker
 ```
 
 Or build and run the binary:
@@ -123,11 +117,14 @@ The application creates a `locations` table with the following structure:
 - [ ] Document access token generation process
 - [ ] Rewrite database logic to use goose and sqlc
 - [ ] Add license
-- [ ] Implement graceful shutdown
+- [x] Implement graceful shutdown
 - [ ] Add unit tests
-- [ ] Add error recovery and reconnection logic
+- [x] Add error recovery and reconnection logic
 - [ ] Add metrics and monitoring
 - [ ] Add CLI flags for runtime configuration
+- [ ] Display connection status in UI
+- [ ] Add tabs to UI ()
+- [ ] Render map with location of a friend in CLI
 
 ## Privacy & Legal
 
