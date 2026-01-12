@@ -36,14 +36,11 @@ func main() {
 	}()
 	log.Println("Database connected successfully")
 
-	// create user cache to store 2GIS friend's profiles
-	userCache := config.NewUserCache()
-
 	// initialize UI state
 	store := state.NewStore()
 
 	// initialize handler
-	h := handler.New(db, userCache, store)
+	h := handler.New(db, store)
 
 	// create context that cancels when Ctrl+C is pressed
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
