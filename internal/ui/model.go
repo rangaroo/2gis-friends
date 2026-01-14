@@ -18,7 +18,7 @@ type Model struct {
 
 func NewModel(store *state.GlobalStore) Model {
 	columns := []table.Column{
-		{Title: "Name", Width: 15},
+		{Title: "Name", Width: 20},
 		{Title: "Battery", Width: 10},
 		{Title: "Last updated", Width: 15},
 		{Title: "Coordinates", Width: 20},
@@ -46,8 +46,11 @@ func NewModel(store *state.GlobalStore) Model {
 	t.SetStyles(s)
 
 	return Model{
-		store: store,
-		table: t,
+		store:     store,
+		table:     t,
+		Tabs       []string,
+		TabContent []string,
+		activeTab  int,
 	}
 }
 
@@ -64,6 +67,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if msg.String() == "q" || msg.String() == "ctrl+c" {
 			return m, tea.Quit
 		}
+	case "right", "l", "n", "tab":
+		m.activeTab = min(m.activeTab+1, len(m.Tabs)-1)
+		return m, nil
+	case "left", "h", "p", "shift+tab":
+		m.activeTab = max(m.activeTab-1, 0)
+		return m, nil
 	case time.Time:
 		friends := m.store.GetViewData()
 		rows := []table.Row{}
