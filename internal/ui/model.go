@@ -10,6 +10,7 @@ import (
 	"github.com/rangaroo/2gis-friends/internal/state"
     "github.com/rangaroo/2gis-friends/internal/config"
     "github.com/rangaroo/2gis-friends/internal/handler"
+    "github.com/rangaroo/2gis-friends/internal/database"
 )
 
 type Model struct {
@@ -27,11 +28,14 @@ type Model struct {
 	backoff       time.Duration
 }
 
-func NewModel(
-	store *state.GlobalStore,
-	cfg   *config.Config,
-	h     *handler.Handler,
-) Model {
+func NewModel(cfg *config.Config, db *database.Client) Model {
+
+	// initialize state to store friend profiles in memory
+	store := state.NewStore()
+
+	// initialize handler
+	h := handler.New(db, store)
+
 	// create context that cancels when Ctrl+C is pressed
 	ctx, cancel := context.WithCancel(context.Background())
 

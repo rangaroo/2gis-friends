@@ -33,11 +33,11 @@ go mod download
 3. Copy the `.env.example` file to `.env` and fill in the values.
 
 ```env
-ACCESS_TOKEN= your_2gis_access_token
-APP_VERSION=  your_app_version # 6.31.0 by default
-USER_AGENT=   your_user_agent
-SITE_DOMAIN=  https://2gis.ru # or kz/ae
-DB_PATH=      your_db_path # "./tracker.db" by default
+ACCESS_TOKEN=your_2gis_access_token
+APP_VERSION=your_app_version # 6.31.0 by default
+USER_AGENT=your_user_agent
+SITE_DOMAIN=https://2gis.ru # or kz/ae
+DB_PATH=your_db_path # "./tracker.db" by default
 ```
 
 ## Configuration
@@ -114,17 +114,21 @@ The application creates a `locations` table with the following structure:
 
 ## Known Issues & TODOs
 
-- [ ] Document access token generation process
-- [ ] Rewrite database logic to use goose and sqlc
-- [ ] Add license
-- [x] Implement graceful shutdown
-- [ ] Add unit tests
-- [x] Add error recovery and reconnection logic
-- [ ] Add metrics and monitoring
-- [ ] Add CLI flags for runtime configuration
+### Features
+
 - [ ] Display connection status in UI
-- [ ] Add tabs to UI ()
-- [ ] Render map with location of a friend in CLI
+- [ ] Add tabs to UI
+- [ ] Render map with location of a friend in CLI (if possible)
+
+### Dev related
+- [ ] Document access token generation process
+- [ ] Rewrite database logic to use goose and sqlc (if needed)
+- [ ] Add license
+- [ ] Implement graceful shutdown
+- [ ] Add unit tests
+- [ ] Add error recovery and reconnection logic
+- [ ] Log metrics and monitoring to a file
+- [ ] Save location data once in 10 minutes (custom)
 
 ## Privacy & Legal
 

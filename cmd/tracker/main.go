@@ -7,10 +7,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 
 	"github.com/rangaroo/2gis-friends/internal/config"
-	"github.com/rangaroo/2gis-friends/internal/database"
-	"github.com/rangaroo/2gis-friends/internal/handler"
 	"github.com/rangaroo/2gis-friends/internal/ui"
-	"github.com/rangaroo/2gis-friends/internal/state"
+    "github.com/rangaroo/2gis-friends/internal/database"
 )
 
 func main() {
@@ -26,20 +24,12 @@ func main() {
 		log.Fatal("Failed to init database:", err)
 	}
 	defer func() {
-		log.Println("Closing database...")
+		//log.Println("Closing database...")
 		db.Close()
 	}()
-	log.Println("Database connected successfully")
-
-	// initialize UI state
-	store := state.NewStore()
-
-	// initialize handler
-	h := handler.New(db, store)
-
 
 	// start UI
-	m := ui.NewModel(store, cfg, h)
+	m := ui.NewModel(cfg, db)
 
 	p := tea.NewProgram(m)
 	if _, err := p.Run(); err != nil {
