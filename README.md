@@ -1,12 +1,12 @@
 # 2GIS Friends Tracker
 
-A real-time location tracker for 2GIS friends that monitors and stores your friends' location data.
+A real-time location tracker that monitors and stores the data of your 2GIS friends.
 
 ## Overview
 
 2GIS is an offline map and navigation tool widely used in Russia, Kazakhstan, Uzbekistan, and other countries ([see the list here](https://en.wikipedia.org/wiki/2GIS)).
 
-This application connects to the 2GIS API via establishing a websocket connection and tracks your friends' locations in real-time. Other data include a battery status, speed, and whether a friend is charging their phone. These data is then store in a local SQLite database for analysis (not implemented uyet).
+This application connects to the 2GIS API and tracks the locations of your friends in real-time by establishing a websocket connection. Other data includes battery status, speed, and whether a friend is charging their phone. These data are then stored in a local SQLite database for analysis (not yet implemented).
 
 ## Features
 
@@ -55,9 +55,9 @@ The application requires the following environment variables:
 
 ### Obtaining Access Token
 
-To run this tracker, you need your personal 2GIS access token. This token allows the application to authenticate as "you" and fetch your friends' locations.
+To run this tracker, you will need your personal 2GIS access token. This token allows the application to authenticate as "you" and fetch the locations of your friends.
 
-> **⚠️ Security Warning:** Your access token is sensitive data (like a password). **Do not** share it publicly or commit it to GitHub. If you share this code, use a `.env` file or environment variables to keep it secret.
+> **⚠️ Security Warning:** Your access token (like a password) is considered sensitive data. **Do not** share it publicly or commit it to GitHub. If you share this code, use a `.env` file or environment variables to keep it secret.
 
 #### Step 1: Log in to 2GIS
 1. Open your web browser (Chrome, Edge, or Firefox recommended)
@@ -70,7 +70,7 @@ To run this tracker, you need your personal 2GIS access token. This token allows
 2. In the developer window that opens, click on the **Network** tab at the top
 
 #### Step 3: Capture the Token
-1. In the **Network** tab, locate the **WS** tab (under the disable cache checkbox)
+1. In the **Network** tab, locate the **WS** tab (under the Disable cache checkbox)
 2. Refresh the page (`F5` or `Ctrl+R`)
 3. You will see many GET requests with 101 status appear
 
@@ -150,3 +150,4 @@ Contributions are welcome! Please feel free to submit a pull request.
 ## Author
 
 [rangaroo](https://github.com/rangaroo)
+
