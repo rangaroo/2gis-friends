@@ -1,8 +1,8 @@
 package ui
 
 import (
-	"time"
 	"context"
+	"time"
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
@@ -12,16 +12,16 @@ import (
 
 type Model struct {
 	// ui
-	table         table.Model
+	table table.Model
 
 	// global state
-	store         *core.GlobalStore
+	state *core.GlobalState
 
-	cfg           *core.Config
-	handler       *core.Handler
+	cfg     *core.Config
+	handler *core.Handler
 
-	ctx           context.Context
-	cancel        context.CancelFunc
+	ctx    context.Context
+	cancel context.CancelFunc
 
 	// concurrent tracker
 	trackerStatus trackerStatus
@@ -29,16 +29,16 @@ type Model struct {
 }
 
 func NewModel(cfg *core.Config, db *core.DatabaseClient) Model {
-	store := core.NewStore()
+	state := core.NewState()
 
-	h := core.New(db, store)
+	h := core.NewHandler(db, state)
 
 	// create context that cancels when Ctrl+C is pressed
 	ctx, cancel := context.WithCancel(context.Background())
 
 	return Model{
 		table:         NewTable(),
-		store:         store,
+		state:         state,
 		cfg:           cfg,
 		handler:       h,
 		ctx:           ctx,
@@ -50,7 +50,7 @@ func NewModel(cfg *core.Config, db *core.DatabaseClient) Model {
 
 func (m Model) Init() tea.Cmd {
 	return tea.Batch(
-		startTrackerCmd(m.ctx, m.cfg, m.handler, m.store),
+		startTrackerCmd(m.ctx, m.cfg, m.handler, m.state),
 		tickCmd(),
 	)
 }

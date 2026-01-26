@@ -3,7 +3,6 @@ package core
 import (
 	"encoding/json"
 	"log"
-
 )
 
 type BaseMessage struct {
@@ -12,14 +11,14 @@ type BaseMessage struct {
 }
 
 type Handler struct {
-	db        *DatabaseClient
-	store     *GlobalStore
+	db    *DatabaseClient
+	store *GlobalState
 }
 
-func New(db *DatabaseClient, store *GlobalStore) *Handler {
+func NewHandler(db *DatabaseClient, store *GlobalState) *Handler {
 	return &Handler{
-		db:        db,
-		store:     store,
+		db:    db,
+		store: store,
 	}
 }
 

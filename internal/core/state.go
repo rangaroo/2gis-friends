@@ -6,20 +6,20 @@ import (
 	"time"
 )
 
-type GlobalStore struct {
-	mu          sync.RWMutex
-	Profiles    map[string]Profile
-	States      map[string]State
+type GlobalState struct {
+	mu       sync.RWMutex
+	Profiles map[string]Profile
+	States   map[string]State
 }
 
-func NewStore() *GlobalStore {
-	return &GlobalStore{
+func NewState() *GlobalState {
+	return &GlobalState{
 		Profiles: make(map[string]Profile),
 		States:   make(map[string]State),
 	}
 }
 
-func (s *GlobalStore) UpdateFromPayload(payload InitialStatePayload) {
+func (s *GlobalState) UpdateFromPayload(payload InitialStatePayload) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -41,7 +41,7 @@ type ViewItem struct {
 	LastSeen   time.Time
 }
 
-func (s *GlobalStore) GetViewData() []ViewItem {
+func (s *GlobalState) GetViewData() []ViewItem {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -53,16 +53,16 @@ func (s *GlobalStore) GetViewData() []ViewItem {
 			name = s.Profiles[id].Name
 		}
 
-		lastSeen := time.Unix(state.LastSeen/1000, 0)
-
-		data = append(data, ViewItem{
+		item := ViewItem{
 			Name:       name,
 			Battery:    state.Battery.Level * 100,
 			IsCharging: state.Battery.IsCharging,
 			Lat:        state.Location.Lat,
 			Lon:        state.Location.Lon,
-			LastSeen:   lastSeen,
-		})
+			LastSeen:   time.Unix(state.LastSeen/1000, 0),
+		}
+
+		data = append(data, item)
 	}
 
 	// sorting is used to keep order of friends the same on each render

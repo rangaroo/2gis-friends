@@ -1,8 +1,8 @@
 package core
 
 import (
-	"net/http"
 	"fmt"
+	"net/http"
 
 	"github.com/gorilla/websocket"
 )
@@ -40,8 +40,8 @@ func (c *WebSocketConn) ReadMessages(handler func([]byte)) error {
 
 func (c *WebSocketConn) Close() error {
 	if c.conn == nil {
-        return nil
-    }
+		return nil
+	}
 
 	c.conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 	return c.conn.Close()

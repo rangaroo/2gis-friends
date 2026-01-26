@@ -1,11 +1,11 @@
 package ui
 
 import (
-	"time"
 	"fmt"
+	"time"
 
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/bubbles/table"
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -59,7 +59,7 @@ var baseStyle = lipgloss.NewStyle().
 func (m *Model) updateTable(msg tea.Msg) (tea.Cmd, bool) {
 	switch msg.(type) {
 	case tickMsg:
-		friends := m.store.GetViewData()
+		friends := m.state.GetViewData()
 		rows := []table.Row{}
 		for _, f := range friends {
 			ago := time.Since(f.LastSeen).Round(time.Second)

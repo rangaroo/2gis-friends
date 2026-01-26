@@ -3,9 +3,9 @@ package ui
 import (
 	"context"
 	"time"
-	
+
 	tea "github.com/charmbracelet/bubbletea"
-	
+
 	"github.com/rangaroo/2gis-friends/internal/core"
 )
 
@@ -26,10 +26,10 @@ type trackerEndedMsg struct {
 type trackerReconnectMsg struct{}
 
 func startTrackerCmd(
-	ctx   context.Context,
-	cfg   *core.Config,
-	h     *core.Handler,
-	store *core.GlobalStore,
+	ctx context.Context,
+	cfg *core.Config,
+	h *core.Handler,
+	state *core.GlobalState,
 ) tea.Cmd {
 	return func() tea.Msg {
 		ws, err := core.Connect(cfg)
@@ -46,7 +46,7 @@ func startTrackerCmd(
 		}()
 
 		select {
-		case <- ctx.Done():
+		case <-ctx.Done():
 			return trackerEndedMsg{Err: nil}
 		case err := <-done:
 			return trackerEndedMsg{Err: err}
@@ -70,7 +70,7 @@ func (m *Model) updateTracker(msg tea.Msg) (tea.Cmd, bool) {
 			return nil, true
 		}
 
-		if m.backoff < 10 * time.Second {
+		if m.backoff < 10*time.Second {
 			m.backoff *= 2
 		}
 
@@ -86,7 +86,7 @@ func (m *Model) updateTracker(msg tea.Msg) (tea.Cmd, bool) {
 			m.backoff = time.Second
 		}
 
-		return startTrackerCmd(m.ctx, m.cfg, m.handler, m.store), true
+		return startTrackerCmd(m.ctx, m.cfg, m.handler, m.state), true
 	}
 
 	return nil, false
