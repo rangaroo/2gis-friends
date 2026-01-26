@@ -1,15 +1,16 @@
 # 2GIS Friends Tracker
 
-A real-time location tracker for 2GIS friends that monitors and stores your friends' location data via WebSocket connection.
+A real-time location tracker for 2GIS friends that monitors and stores your friends' location data.
 
 ## Overview
 
-This application connects to the 2GIS WebSocket API to track your friends' locations in real-time. It receives location updates, battery status, and other state information, displaying them in the console and storing them in a SQLite database for historical analysis.
+2GIS is an offline map and navigation tool widely used in Russia, Kazakhstan, Uzbekistan, and other countries ([see the list here](https://en.wikipedia.org/wiki/2GIS)).
+
+This application connects to the 2GIS API via establishing a websocket connection and tracks your friends' locations in real-time. Other data include a battery status, speed, and whether a friend is charging their phone. These data is then store in a local SQLite database for analysis (not implemented uyet).
 
 ## Features
 
-- **Real-time Location Tracking**: Connects to 2GIS WebSocket API for live updates
-- **Friend Profile Management**: Caches friend profiles for quick lookups
+- **Real-time Location Tracking**: Connects to 2GIS API for live updates
 - **Location History**: Stores all location updates in a SQLite database
 
 ## Prerequisites
@@ -59,14 +60,14 @@ To run this tracker, you need your personal 2GIS access token. This token allows
 > **⚠️ Security Warning:** Your access token is sensitive data (like a password). **Do not** share it publicly or commit it to GitHub. If you share this code, use a `.env` file or environment variables to keep it secret.
 
 #### Step 1: Log in to 2GIS
-1. Open your web browser (Chrome, Edge, or Firefox recommended).
-2. Go to [2gis.kz](https://2gis.kz) (or 2gis.ru).
-3. Log in to your account if you haven't already.
-4. Go to the **friends tab**
+1. Open your web browser (Chrome, Edge, or Firefox recommended)
+2. Go to [2gis.kz](https://2gis.kz) (or 2gis.ru)
+3. Log in to your account if you haven't already
+4. Go to the **Friends** tab
 
 #### Step 2: Open Developer Tools
-1. Right-click anywhere on the page and select **Inspect** (or press `F12` / `Ctrl+Shift+I`).
-2. In the developer window that opens, click on the **Network** tab at the top.
+1. Right-click anywhere on the page and select **Inspect** (or press `F12` / `Ctrl+Shift+I`)
+2. In the developer window that opens, click on the **Network** tab at the top
 
 #### Step 3: Capture the Token
 1. In the **Network** tab, locate the **WS** tab (under the disable cache checkbox)
@@ -118,7 +119,6 @@ The application creates a `locations` table with the following structure:
 
 - [ ] Display connection status in UI
 - [ ] Add tabs to UI
-- [ ] Render map with location of a friend in CLI (if possible)
 
 ### Dev related
 - [ ] Document access token generation process
@@ -132,17 +132,16 @@ The application creates a `locations` table with the following structure:
 
 ## Privacy & Legal
 
-⚠️ **Important**: This tool tracks location data of other users. Ensure you have:
-- Proper authorization to track friends' locations
-- Compliance with local privacy laws and regulations
-- Consent from tracked individuals where required
-- Understanding of 2GIS Terms of Service
+**This project is for educational and research purposes only**
 
-Use this tool responsibly and ethically.
+1.  **Unofficial:** This project is **not** affiliated with, endorsed by, or connected to 2GIS.
+2.  **Terms of Service:** Using this tool may violate 2GIS's Terms of Service. Use it at your own risk. The author is not responsible if your account gets banned or restricted.
+3.  **Privacy:** This tool allows tracking location data. It is the user's responsibility to ensure they have the consent of the individuals they are tracking and to comply with local privacy laws.
+4.  **No Liability:** The software is provided "as is", without warranty of any kind. The author is not responsible for any damage, data loss, or legal consequences resulting from the use of this tool.
 
 ## License
 
-[TODO]
+[MIT license](https://github.com/rangaroo/2gis-friends/blob/main/LICENSE)
 
 ## Contributing
 
