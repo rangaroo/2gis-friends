@@ -7,34 +7,31 @@ import (
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 
-	"github.com/rangaroo/2gis-friends/internal/state"
-    "github.com/rangaroo/2gis-friends/internal/config"
-    "github.com/rangaroo/2gis-friends/internal/handler"
-    "github.com/rangaroo/2gis-friends/internal/database"
+	"github.com/rangaroo/2gis-friends/internal/core"
 )
 
 type Model struct {
-	table table.Model
+	// ui
+	table         table.Model
 
-	store         *state.GlobalStore
+	// global state
+	store         *core.GlobalStore
 
-	cfg           *config.Config	
-	handler       *handler.Handler
+	cfg           *core.Config
+	handler       *core.Handler
 
 	ctx           context.Context
 	cancel        context.CancelFunc
 
+	// concurrent tracker
 	trackerStatus trackerStatus
 	backoff       time.Duration
 }
 
-func NewModel(cfg *config.Config, db *database.Client) Model {
+func NewModel(cfg *core.Config, db *core.DatabaseClient) Model {
+	store := core.NewStore()
 
-	// initialize state to store friend profiles in memory
-	store := state.NewStore()
-
-	// initialize handler
-	h := handler.New(db, store)
+	h := core.New(db, store)
 
 	// create context that cancels when Ctrl+C is pressed
 	ctx, cancel := context.WithCancel(context.Background())
@@ -59,7 +56,7 @@ func (m Model) Init() tea.Cmd {
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	// try to handle msg with custom commands
+	// try to handle msg with custom commands first
 	if cmd, handled := m.updateTable(msg); handled {
 		return m, cmd
 	}
@@ -68,7 +65,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, cmd
 	}
 
-	// default key handling
+	// key press handling
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		if msg.String() == "q" || msg.String() == "ctrl+c" {
@@ -79,8 +76,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 	}
+
 	var cmd tea.Cmd
 	m.table, cmd = m.table.Update(msg)
+
 	return m, cmd
 }
 

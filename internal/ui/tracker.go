@@ -6,10 +6,7 @@ import (
 	
 	tea "github.com/charmbracelet/bubbletea"
 	
-	"github.com/rangaroo/2gis-friends/internal/state"
-	"github.com/rangaroo/2gis-friends/internal/client"
-    "github.com/rangaroo/2gis-friends/internal/config"
-    "github.com/rangaroo/2gis-friends/internal/handler"
+	"github.com/rangaroo/2gis-friends/internal/core"
 )
 
 // bubbletea message and command
@@ -30,12 +27,12 @@ type trackerReconnectMsg struct{}
 
 func startTrackerCmd(
 	ctx   context.Context,
-	cfg   *config.Config,
-	h     *handler.Handler,
-	store *state.GlobalStore,
+	cfg   *core.Config,
+	h     *core.Handler,
+	store *core.GlobalStore,
 ) tea.Cmd {
 	return func() tea.Msg {
-		ws, err := client.Connect(cfg)
+		ws, err := core.Connect(cfg)
 		if err != nil {
 			return trackerEndedMsg{Err: err}
 		}

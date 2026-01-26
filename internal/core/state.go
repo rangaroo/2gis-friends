@@ -1,28 +1,25 @@
-package state
+package core
 
 import (
 	"sort"
 	"sync"
 	"time"
-
-	"github.com/rangaroo/2gis-friends/internal/models"
 )
 
 type GlobalStore struct {
 	mu          sync.RWMutex
-	Profiles    map[string]models.Profile
-	States      map[string]models.State
-	IsConnected bool
+	Profiles    map[string]Profile
+	States      map[string]State
 }
 
 func NewStore() *GlobalStore {
 	return &GlobalStore{
-		Profiles: make(map[string]models.Profile),
-		States:   make(map[string]models.State),
+		Profiles: make(map[string]Profile),
+		States:   make(map[string]State),
 	}
 }
 
-func (s *GlobalStore) UpdateFromPayload(payload models.InitialStatePayload) {
+func (s *GlobalStore) UpdateFromPayload(payload InitialStatePayload) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -33,12 +30,6 @@ func (s *GlobalStore) UpdateFromPayload(payload models.InitialStatePayload) {
 	for _, st := range payload.States {
 		s.States[st.ID] = st
 	}
-}
-
-func (s *GlobalStore) SetConnection(connected bool) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.IsConnected = connected
 }
 
 type ViewItem struct {

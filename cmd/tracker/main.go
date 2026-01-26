@@ -6,20 +6,19 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"github.com/rangaroo/2gis-friends/internal/config"
+	"github.com/rangaroo/2gis-friends/internal/core"
 	"github.com/rangaroo/2gis-friends/internal/ui"
-    "github.com/rangaroo/2gis-friends/internal/database"
 )
 
 func main() {
 	// load config
-	cfg, err := config.Load()
+	cfg, err := core.Load()
 	if err != nil {
 		log.Fatal("Could not load config:", err)
 	}
 
 	// initialize database
-	db, err := database.NewClient(cfg.DBpath)
+	db, err := core.NewDatabaseClient(cfg.DBpath)
 	if err != nil {
 		log.Fatal("Failed to init database:", err)
 	}
