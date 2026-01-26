@@ -1,24 +1,23 @@
-package database
+package core
 
 import (
 	"database/sql"
 	"fmt"
 
-	"github.com/rangaroo/2gis-friends/internal/models"
 	_ "modernc.org/sqlite"
 )
 
-type Client struct {
+type DatabaseClient struct {
 	db *sql.DB
 }
 
-func NewClient(filepath string) (*Client, error) {
+func NewDatabaseClient(filepath string) (*DatabaseClient, error) {
 	db, err := sql.Open("sqlite", filepath)
 	if err != nil {
 		return nil, err
 	}
 
-	c := &Client{db: db}
+	c := &DatabaseClient{db: db}
 	if err := c.initSchema(); err != nil {
 		return nil, err
 	}
@@ -26,7 +25,7 @@ func NewClient(filepath string) (*Client, error) {
 	return c, nil
 }
 
-func (c *Client) initSchema() error {
+func (c *DatabaseClient) initSchema() error {
 	schema := `
 	CREATE TABLE IF NOT EXISTS locations (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -45,7 +44,7 @@ func (c *Client) initSchema() error {
 	return err
 }
 
-func (c *Client) SaveState(state models.State) error {
+func (c *DatabaseClient) SaveState(state State) error {
 	query := `INSERT INTO locations (user_id, lat, lon, accuracy, speed, battery_level, is_charging, timestamp)
 	          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 
@@ -62,7 +61,7 @@ func (c *Client) SaveState(state models.State) error {
 	return err
 }
 
-func (c *Client) Reset() error {
+func (c *DatabaseClient) Reset() error {
 	if _, err := c.db.Exec("DELETE FROM locations"); err != nil {
 		return fmt.Errorf("failed to reset table locations: %w", err)
 	}
@@ -70,6 +69,6 @@ func (c *Client) Reset() error {
 	return nil
 }
 
-func (c *Client) Close() {
+func (c *DatabaseClient) Close() {
 	c.db.Close()
 }

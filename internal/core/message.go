@@ -1,12 +1,8 @@
-package handler
+package core
 
 import (
 	"encoding/json"
 	"log"
-
-	"github.com/rangaroo/2gis-friends/internal/database"
-	"github.com/rangaroo/2gis-friends/internal/models"
-	"github.com/rangaroo/2gis-friends/internal/state"
 )
 
 type BaseMessage struct {
@@ -15,14 +11,14 @@ type BaseMessage struct {
 }
 
 type Handler struct {
-	db        *database.Client
-	store     *state.GlobalStore
+	db    *DatabaseClient
+	store *GlobalState
 }
 
-func New(db *database.Client, store *state.GlobalStore) *Handler {
+func NewHandler(db *DatabaseClient, store *GlobalState) *Handler {
 	return &Handler{
-		db:        db,
-		store:     store,
+		db:    db,
+		store: store,
 	}
 }
 
@@ -39,18 +35,17 @@ func (h *Handler) HandleMessage(data []byte) {
 	case "friendState":
 		h.handleFriendState(base.Payload)
 	default:
-		// Ignore heartbeats or other messages
+		// Ignore other messages
 	}
 }
 
 func (h *Handler) handleInitialState(payload json.RawMessage) {
-	var data models.InitialStatePayload
+	var data InitialStatePayload
 	if err := json.Unmarshal(payload, &data); err != nil {
 		log.Println("Error parsing initialState:", err)
 		return
 	}
 
-	// update profile data of global state
 	h.store.UpdateFromPayload(data)
 
 	for _, s := range data.States {
@@ -61,7 +56,7 @@ func (h *Handler) handleInitialState(payload json.RawMessage) {
 }
 
 func (h *Handler) handleFriendState(payload json.RawMessage) {
-	var state models.State
+	var state State
 	if err := json.Unmarshal(payload, &state); err != nil {
 		log.Println("Error parsing friendState:", err)
 		return
