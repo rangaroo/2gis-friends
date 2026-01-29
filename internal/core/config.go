@@ -15,10 +15,10 @@ type Config struct {
 	DBpath      string
 }
 
-func Load() (*Config, error) {
+func LoadConfig() (Config, error) {
 	godotenv.Load(".env")
 
-	cfg := &Config{
+	cfg := Config{
 		AccessToken: os.Getenv("ACCESS_TOKEN"),
 		AppVersion:  os.Getenv("APP_VERSION"),
 		UserAgent:   os.Getenv("USER_AGENT"),
@@ -27,13 +27,13 @@ func Load() (*Config, error) {
 	}
 
 	if err := cfg.validate(); err != nil {
-		return nil, err
+		return Config{}, err
 	}
 
 	return cfg, nil
 }
 
-func (c *Config) validate() error {
+func (c Config) validate() error {
 	if c.AccessToken == "" {
 		return fmt.Errorf("ACCESS_TOKEN must be set") //TODO: Figure out how to generate these tokens
 	}
@@ -52,7 +52,7 @@ func (c *Config) validate() error {
 	return nil
 }
 
-func (c *Config) WebSocketURL() string {
+func (c Config) WebSocketURL() string {
 	return fmt.Sprintf(
 		"wss://zond.api.2gis.ru/api/1.1/user/ws?appVersion=%s&channels=markers,sharing,routes&token=%s",
 		c.AppVersion,

@@ -11,7 +11,7 @@ type WebSocketConn struct {
 	conn *websocket.Conn
 }
 
-func Connect(cfg *Config) (*WebSocketConn, error) {
+func ConnectToWebSocket(cfg Config) (*WebSocketConn, error) {
 	headers := http.Header{}
 	headers.Add("Origin", cfg.SiteDomain)
 	headers.Add("User-Agent", cfg.UserAgent)
@@ -34,7 +34,7 @@ func (c *WebSocketConn) ReadMessages(handler func([]byte)) error {
 		if err != nil {
 			return err
 		}
-		handler(message)
+		handler(message) // TODO: rewrite everything to bubbletea commands
 	}
 }
 

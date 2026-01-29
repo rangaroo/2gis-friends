@@ -23,6 +23,7 @@ func NewTable() table.Model {
 	columns := []table.Column{
 		{Title: "Name", Width: 20},
 		{Title: "Battery", Width: 10},
+		{Title: "Speed", Width: 10},
 		{Title: "Last updated", Width: 15},
 		{Title: "Coordinates", Width: 20},
 	}
@@ -60,16 +61,20 @@ func (m *Model) updateTable(msg tea.Msg) (tea.Cmd, bool) {
 	switch msg.(type) {
 	case tickMsg:
 		friends := m.state.GetViewData()
+
 		rows := []table.Row{}
+
 		for _, f := range friends {
 			ago := time.Since(f.LastSeen).Round(time.Second)
-
-			rows = append(rows, table.Row{
+			row := table.Row{
 				f.Name,
 				fmt.Sprintf("%.0f%%", f.Battery),
+				fmt.Sprintf("%.1f", f.Speed),
 				fmt.Sprintf("%s", ago),
 				fmt.Sprintf("%.4f, %.4f", f.Lat, f.Lon),
-			})
+			}
+
+			rows = append(rows, row)
 		}
 		m.table.SetRows(rows)
 

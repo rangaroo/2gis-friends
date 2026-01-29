@@ -35,6 +35,7 @@ func (s *GlobalState) UpdateFromPayload(payload InitialStatePayload) {
 type ViewItem struct {
 	Name       string
 	Battery    float64
+	Speed      float64
 	IsCharging bool
 	Lat        float64
 	Lon        float64
@@ -56,6 +57,7 @@ func (s *GlobalState) GetViewData() []ViewItem {
 		item := ViewItem{
 			Name:       name,
 			Battery:    state.Battery.Level * 100,
+			Speed:      state.Location.Speed,
 			IsCharging: state.Battery.IsCharging,
 			Lat:        state.Location.Lat,
 			Lon:        state.Location.Lon,

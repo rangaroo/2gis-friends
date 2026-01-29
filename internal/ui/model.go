@@ -17,7 +17,7 @@ type Model struct {
 	// global state
 	state *core.GlobalState
 
-	cfg     *core.Config
+	cfg     core.Config
 	handler *core.Handler
 
 	ctx    context.Context
@@ -28,7 +28,7 @@ type Model struct {
 	backoff       time.Duration
 }
 
-func NewModel(cfg *core.Config, db *core.DatabaseClient) Model {
+func NewModel(cfg core.Config, db *core.DatabaseClient) Model {
 	state := core.NewState()
 
 	h := core.NewHandler(db, state)

@@ -27,12 +27,12 @@ type trackerReconnectMsg struct{}
 
 func startTrackerCmd(
 	ctx context.Context,
-	cfg *core.Config,
+	cfg core.Config,
 	h *core.Handler,
 	state *core.GlobalState,
 ) tea.Cmd {
 	return func() tea.Msg {
-		ws, err := core.Connect(cfg)
+		ws, err := core.ConnectToWebSocket(cfg)
 		if err != nil {
 			return trackerEndedMsg{Err: err}
 		}
