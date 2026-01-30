@@ -25,6 +25,30 @@ type trackerEndedMsg struct {
 
 type trackerReconnectMsg struct{}
 
+type webSocketMessage struct {
+	Msg []byte
+}
+
+// TODO: compelete this code
+func listenForMessage(sub <-chan []byte) tea.Cmd {
+	return func() tea.Msg {
+		ws, err := core.ConnectToWebSocket(cfg)
+		if err != nil {
+			return trackerEndedMsg{Err: err}
+		}
+		defer ws.Close()
+
+		for {
+			_, msg, err := ws.conn.ReadMessage()
+			if err != nil {
+				return trackerEndedMsg{Err: err}
+			}
+
+
+		}
+	}
+}
+
 func startTrackerCmd(
 	ctx context.Context,
 	cfg core.Config,
