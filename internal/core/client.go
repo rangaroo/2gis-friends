@@ -17,7 +17,6 @@ func ConnectToWebSocket(cfg Config) (*WebSocketConn, error) {
 	headers.Add("User-Agent", cfg.UserAgent)
 
 	// Connect to websocket
-	//log.Println("Connecting to 2GIS...")
 	conn, _, err := websocket.DefaultDialer.Dial(cfg.WebSocketURL(), headers)
 	if err != nil {
 		return nil, fmt.Errorf("connection failed: %w", err)
@@ -28,14 +27,9 @@ func ConnectToWebSocket(cfg Config) (*WebSocketConn, error) {
 	return &WebSocketConn{conn: conn}, nil
 }
 
-func (c *WebSocketConn) ReadMessages(handler func([]byte)) error {
-	for {
-		_, message, err := c.conn.ReadMessage()
-		if err != nil {
-			return err
-		}
-		handler(message) // TODO: rewrite everything to bubbletea commands
-	}
+func (c *WebSocketConn) ReadMessages() ([]byte, error) {
+	_, message, err := c.conn.ReadMessage()
+	return message, err
 }
 
 func (c *WebSocketConn) Close() error {
