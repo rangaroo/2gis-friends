@@ -26,6 +26,7 @@ type Model struct {
 	// concurrent tracker
 	trackerStatus trackerStatus
 	reconnectTimeout time.Duration
+	sub chan interface{}
 }
 
 func NewModel(cfg core.Config, db *core.DatabaseClient) Model {
@@ -45,14 +46,12 @@ func NewModel(cfg core.Config, db *core.DatabaseClient) Model {
 		cancel:        cancel,
 		trackerStatus: trackerDisconnected,
 		reconnectTimeout:       time.Second,
+		sub: make(chan interface{}),
 	}
 }
 
 func (m Model) Init() tea.Cmd {
-	return tea.Batch(
-		startTrackerCmd(m.ctx, m.cfg, m.handler, m.state),
-		tickCmd(),
-	)
+	return connectToTrackerCmd(m.cfg)
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {

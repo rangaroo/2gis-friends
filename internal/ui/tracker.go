@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"context"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -64,11 +63,9 @@ func waitForMessages(sub chan interface{}) tea.Cmd {
 }
 
 func reconnectAfterCmd(timeout time.Duration) tea.Cmd {
-	return tea.Tick(timeout,
-		func(_, time.Time) tea.Msg {
-			return trackerReconnectMsg{}
-		}
-	)
+	return tea.Tick(timeout, func(_ time.Time) tea.Msg {
+		return trackerReconnectMsg{}
+	})
 }
 
 func (m *Model) updateTracker(msg tea.Msg) (tea.Cmd, bool) {
