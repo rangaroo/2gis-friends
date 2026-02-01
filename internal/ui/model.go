@@ -25,7 +25,7 @@ type Model struct {
 
 	// concurrent tracker
 	trackerStatus trackerStatus
-	backoff       time.Duration
+	reconnectTimeout time.Duration
 }
 
 func NewModel(cfg core.Config, db *core.DatabaseClient) Model {

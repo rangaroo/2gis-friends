@@ -31,7 +31,44 @@ type trackerEndedMsg struct {
 type trackerReconnectMsg struct {}
 
 func connectToTrackerCmd(cfg core.Config) tea.Cmd {
-	
+	return func() tea.Msg {
+		conn, err := core.ConnectToWebSocket(cfg)
+		if err != nil {
+			return trackerEndedMsg{err: err}
+		}
+		
+		return trackerConnectedMsg{conn: conn}
+	}
+}
+
+func produceMessagesCmd(conn *core.WebSocketConn, sub chan interface{}) tea.Cmd {
+	return func() tea.Msg {
+		defer conn.Close()
+
+		for {
+			msg, err := conn.ReadMessages()
+			if err != nil {
+				sub <- trackerEndedMsg{err: err} // research how to deal with this situation
+				return nil
+			}
+
+			sub <- trackerDataMsg(msg)
+		}
+	}
+}
+
+func waitForMessages(sub chan interface{}) tea.Cmd {
+	return func() tea.Msg {
+		return <-sub
+	}
+}
+
+func reconnectAfterCmd(timeout time.Duration) tea.Cmd {
+	return tea.Tick(timeout,
+		func(_, time.Time) tea.Msg {
+			return trackerReconnectMsg{}
+		}
+	)
 }
 
 func (m *Model) updateTracker(msg tea.Msg) (tea.Cmd, bool) {
