@@ -44,7 +44,7 @@ func NewModel(cfg core.Config, db *core.DatabaseClient) Model {
 		ctx:           ctx,
 		cancel:        cancel,
 		trackerStatus: trackerDisconnected,
-		backoff:       time.Second,
+		reconnectTimeout:       time.Second,
 	}
 }
 
