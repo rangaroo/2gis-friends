@@ -51,7 +51,11 @@ func NewModel(cfg core.Config, db *core.DatabaseClient) Model {
 }
 
 func (m Model) Init() tea.Cmd {
-	return connectToTrackerCmd(m.cfg)
+	//return connectToTrackerCmd(m.cfg)
+	return tea.Batch(
+		connectToTrackerCmd(m.cfg),
+		tickCmd(),
+	)
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -83,10 +87,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
-	s := "\n  📡 2GIS FRIEND TRACKER\n"
-	s += "  ──────────────────────\n"
-
-	s += baseStyle.Render(m.table.View()) + "\n"
+	s := baseStyle.Render(m.table.View()) + "\n"
 
 	s += "\n (Press 'q' to quit)\n"
 	return s
